@@ -20,6 +20,10 @@ var employee = new Schema({
     password: {
         type: String,
         required: true
+    },
+    role:{
+        type: String,
+        required: true
     }
 });
 
@@ -27,14 +31,21 @@ const validateEmployee = (data) => {
 
     const schema = Joi.object({
         first_name: Joi.string(),
-        last_name: Joi.string(),
+        last_name: Joi.string().allow(""),
         username: Joi.string(),
         password: Joi.string(),
     });
     return schema.validate(data);
-    
+};
+
+const validateLogin = (data) => {
+    const schema = Joi.object({
+        username: Joi.string(),
+        password: Joi.string(),
+    });
+    return schema.validate(data);
 }
 
 const Employee = mongoose.model('Employee', employee);
 
-module.exports = { Employee, validateEmployee };
+module.exports = { Employee, validateEmployee, validateLogin };

@@ -2,7 +2,9 @@ const jwtHelper = require('../lib/jwthelper');
 
 const Auth = (role) => {
 
-    return (req, res, next) => {
+    console.log(role);
+
+    return async (req, res, next) => {
 
         const authHeader = req.headers["authorization"];
 
@@ -10,13 +12,13 @@ const Auth = (role) => {
 
             const token = authHeader.split(" ")[1];
 
-            const decoded = jwtHelper.verifyToken(token);
-
-
-
+            const decoded = await jwtHelper.verifyToken(token);
+            
             if (!role.includes(decoded?.role)) {
                 return res.status(403).send({ message: "no permission to access" });
-            }
+            };
+
+            req.user = decoded;
 
             next();
 
