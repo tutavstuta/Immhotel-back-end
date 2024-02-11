@@ -12,6 +12,7 @@ connectDatabase();
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var employeeRouter = require('./routes/employee');
+var hotelRouter = require('./routes/hotel');
 
 var app = express();
 app.use(cors());
@@ -30,6 +31,7 @@ const prefix ='/imm_hotel'
 app.use(prefix+'/', indexRouter);
 app.use(prefix+'/users', usersRouter);
 app.use(prefix+'/employee', employeeRouter);
+app.use(prefix+'/hotel', hotelRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
