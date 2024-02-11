@@ -46,6 +46,14 @@ const validateLogin = (data) => {
     return schema.validate(data);
 }
 
+const validateUpdateEmployee = (data) => {
+    const schema = Joi.object({
+        first_name: Joi.string().allow(""),
+        last_name: Joi.string().allow(""),
+    });
+    return schema.validate(data);
+}
+
 const Employee = mongoose.model('Employee', employee);
 
-module.exports = { Employee, validateEmployee, validateLogin };
+module.exports = { Employee, validateEmployee, validateLogin,validateUpdateEmployee };

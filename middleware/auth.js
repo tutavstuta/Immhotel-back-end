@@ -2,31 +2,42 @@ const jwtHelper = require('../lib/jwthelper');
 
 const Auth = (role) => {
 
-    console.log(role);
+    try {
 
-    return async (req, res, next) => {
 
-        const authHeader = req.headers["authorization"];
+        return async (req, res, next) => {
 
-        if (authHeader && authHeader.startsWith("Bearer ")) {
+            const authHeader = req.headers["authorization"];
 
-            const token = authHeader.split(" ")[1];
+            if (authHeader && authHeader.startsWith("Bearer ")) {
 
-            const decoded = await jwtHelper.verifyToken(token);
-            
-            if (!role.includes(decoded?.role)) {
-                return res.status(403).send({ message: "no permission to access" });
-            };
+                const token = authHeader.split(" ")[1];
 
-            req.user = decoded;
+                jwtHelper.verifyToken(token).then((decoded) => {
 
-            next();
+                    if (!role.includes(decoded?.role)) {
+                        return res.status(403).send({ message: "no permission to access" });
+                    };
 
-        } else {
+                    console.log('decode',decoded);
 
-            return res.status(400).send({ message: "invalide authorization" });
+                    req.user = decoded;
+
+                    next();
+                }).catch((err)=>{
+                    console.log(err);
+                    return res.send(err);
+                });
+
+            } else {
+
+                return res.status(400).send({ message: "invalide authorization" });
+            }
         }
+    } catch (error) {
+        return res.send(error.message);
     }
+
 };
 
 module.exports = Auth;

@@ -11,7 +11,13 @@ module.exports.create = async (req, res) => {
             return res.status(400).send({ message: "validate error", error: error.details[0].message });
         };
 
-        const password = bcrypt.hashSync(req.body.password,10);
+        const isExistUsername = await Employee.findOne({username:req.body.username});
+
+        if(isExistUsername){
+            return res.status(200).send({ message:"username already exists"})
+        }
+
+        const password = bcrypt.hashSync(req.body.password, 10);
 
         const data = {
             first_name: req.body.first_name,
@@ -57,7 +63,7 @@ module.exports.login = async (req, res) => {
                 name: employee.first_name,
                 role: employee.role
             };
-            
+
             const token = generateToken(payload);
 
             return res.status(200).send({ message: "login successful", token: token, tokenType: "Bearer" });
@@ -72,7 +78,7 @@ module.exports.login = async (req, res) => {
 module.exports.me = async (req, res) => {
     try {
 
-        return res.send(req.user);
+        return res.send({ message: "get me successfully", data: req.user });
 
     } catch (error) {
         console.error(error);
@@ -110,7 +116,18 @@ module.exports.update = async (req, res) => {
 
         const id = req.params.id;
 
-        const result = await Employee.findByIdAndUpdate(id, { ...req.body }, { returnDocument: 'after' });
+        const employee = await Employee.findById(id);
+
+        if(!employee){
+            return res.status(404).send({ message: "employee not found"})
+        }
+
+        const updateData = {
+            "first_name": req.body.first_name?req.body.first_name:employee.first_name,
+            "last_name": req.body.last_name
+        }
+
+        const result = await Employee.findByIdAndUpdate(id, updateData, { returnDocument: 'after' });
 
         return res.status(200).send({ message: "update empoyee successfully", data: result._id });
 
@@ -130,6 +147,19 @@ module.exports.delete = async (req, res) => {
 
         return res.status(200).send({ message: "delete successfully", data: result._id });
 
+    } catch (error) {
+        console.error(error);
+        return res.send(error.message);
+    }
+};
+
+module.exports.getById = async (req,res) => {
+    try {
+
+        const employee = await Employee.findById(req.params.id,{password:0});
+
+        return res.status(200).send({message:"get employee successfully",data:employee });
+        
     } catch (error) {
         console.error(error);
         return res.send(error.message);
