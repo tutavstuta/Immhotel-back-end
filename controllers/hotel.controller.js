@@ -66,7 +66,7 @@ module.exports.update = async (req, res) => {
 
         const result = await Hotel.findByIdAndUpdate(id, {...req.body}, { returnDocument: 'after' });
 
-        return res.status(200).send({ message: "update empoyee successfully", data: result._id });
+        return res.status(200).send({ message: "update hotel successfully", data: result._id });
 
 
     } catch (error) {

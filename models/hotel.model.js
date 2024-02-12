@@ -44,7 +44,7 @@ var hotel = new Schema({
         type: String
     },
     parking: {
-        type: Boolean
+        type: String
     },
     property_policies: {
         type: String
@@ -72,7 +72,7 @@ const validateHotel = (data) => {
         highlight: Joi.string().allow(""),
         special_service: Joi.string().allow(""),
         nearly_place: Joi.string().allow(""),
-        parking: Joi.boolean(),
+        parking: Joi.string().allow(""),
         property_policies: Joi.string().allow(""),
         certificate: Joi.string().allow(""),
         other_information: Joi.string().allow(""),
