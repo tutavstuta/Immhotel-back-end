@@ -28,9 +28,6 @@ var hotel = new Schema({
     country: {
         type: String
     },
-    image_url: [{
-        type: String
-    }],
     amenities: {
         type: String
     },

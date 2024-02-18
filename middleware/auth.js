@@ -19,8 +19,6 @@ const Auth = (role) => {
                         return res.status(403).send({ message: "no permission to access" });
                     };
 
-                    console.log('decode',decoded);
-
                     req.user = decoded;
 
                     next();

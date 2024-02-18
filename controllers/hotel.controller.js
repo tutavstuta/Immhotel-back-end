@@ -93,9 +93,19 @@ module.exports.delete = async (req, res) => {
 module.exports.getById = async (req,res) => {
     try {
 
-        const hotel = await Hotel.findById(req.params.id);
+        const pipeline = [
+            {
+              '$lookup': {
+                'from': 'hotelimages', 
+                'let': {}, 
+                'pipeline': [], 
+                'as': 'image'
+              }
+            }
+          ]
+        const hotel = await Hotel.aggregate(pipeline);
 
-        return res.status(200).send({message:"get hotel successfully",data:hotel });
+        return res.status(200).send({message:"get hotel successfully",data:hotel[0] });
         
     } catch (error) {
         console.error(error);
