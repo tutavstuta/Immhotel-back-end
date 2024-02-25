@@ -24,6 +24,12 @@ var room = new Schema({
     type: Number,
     required: true
   },
+  image: {
+    type: String
+  },
+  description: {
+    type: String
+  }
 
 });
 
@@ -31,11 +37,13 @@ const validateRoom = (data) => {
     const schema = Joi.object({
 
         base_price: Joi.number().required(),    
-        type: Joi.string(),
-        max_person: Joi.number().required(),
-        children: Joi.number().required(),
+        type: Joi.string().required(),
+        max_person: Joi.number(),
+        children: Joi.number(),
         base_price: Joi.number().required(),    
         room_amount: Joi.number().required(),
+        description: Joi.string(),
+
     });
 
     return schema.validate(data);

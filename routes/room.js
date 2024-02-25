@@ -9,4 +9,7 @@ router.post('/',Auth(['employee']),Room.create);
 router.patch('/:id',Auth(['employee']),Room.update);
 router.delete('/:id',Auth(['employee']),Room.delete);
 
+//upload
+router.post('/upload-cover/:id',Auth(['employee']),Room.uploadCoverImage);
+
 module.exports = router;

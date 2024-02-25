@@ -1,6 +1,8 @@
 const { Room, validateRoom } = require('../models/room.model');
 const multer = require('multer')
 const upload = multer({ dest: '../uploads/' }).array('image', 50);
+const uploadsingle = multer({ dest: '../uploads/' }).single('image');
+const fs = require('fs');
 
 module.exports.create = async (req, res) => {
     try {
@@ -32,7 +34,7 @@ module.exports.getAll = async (req, res) => {
 
         const pipeline = [
             {
-                $match:{}
+                $match: {}
             }
         ]
         const room = await Room.aggregate(pipeline);
@@ -45,16 +47,16 @@ module.exports.getAll = async (req, res) => {
     }
 };
 
-module.exports.getById = async (req,res) => {
+module.exports.getById = async (req, res) => {
     try {
 
         const id = req.params.id;
 
         const pipeline = [
             {
-                $match:{
-                    $expr:{
-                        $eq:[{$toString:"$_id"},id]
+                $match: {
+                    $expr: {
+                        $eq: [{ $toString: "$_id" }, id]
                     }
                 }
             }
@@ -62,8 +64,8 @@ module.exports.getById = async (req,res) => {
 
         const room = await Room.aggregate(pipeline);
 
-        return res.status(200).send({message:"get room  successfully",data:room[0]});
-        
+        return res.status(200).send({ message: "get room  successfully", data: room[0] });
+
     } catch (error) {
         console.error(error);
         return res.send(error.message);
@@ -96,10 +98,57 @@ module.exports.delete = async (req, res) => {
 
         const result = await Room.findByIdAndDelete(id);
 
-        return res.status(200).send({message:"delete room successfully",data:result._id});
-        
+        return res.status(200).send({ message: "delete room successfully", data: result._id });
+
     } catch (error) {
         console.error(error);
         return res.send(error.message);
     }
+};
+
+module.exports.uploadCoverImage = async (req, res) => {
+
+    uploadsingle(req, res, async function (err) {
+        if (err instanceof multer.MulterError) {
+            return res.status(400).send({ message: 'multer error', error: err.message });
+        } else if (err) {
+            return res.status(400).send({ message: 'upload error', error: err.message });
+        };
+
+        const id = req.params.id;
+        console.log('id', id);
+
+        if (!id || id == "") {
+            fs.unlink('../uploads/' + req.file.filename, error => {
+
+                console.error(error.message);
+            })
+            return res.status(403).send({ message: "id is required" })
+        }
+
+        try {
+
+            const room = await Room.findById(id);
+
+                fs.unlink('../uploads/' + room.image, err => {
+                    if (err) console.error(err);
+                    console.log(room.image+' was deleted');
+                });
+
+
+            const result = await Room.findByIdAndUpdate(id, { image: req.file.filename });
+
+            if (result) {
+
+                return res.status(200).send({ message: 'upload image successfully', data: result._id });
+
+            } else {
+                return res.status(400).send({ message: "upload image failed" });
+            }
+
+        } catch (error) {
+            return res.send(error.message)
+        }
+    });
+
 }
