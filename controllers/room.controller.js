@@ -1,6 +1,5 @@
 const { Room, validateRoom } = require('../models/room.model');
 const multer = require('multer')
-const upload = multer({ dest: '../uploads/' }).array('image', 50);
 const uploadsingle = multer({ dest: '../uploads/' }).single('image');
 const fs = require('fs');
 
@@ -54,13 +53,36 @@ module.exports.getById = async (req, res) => {
 
         const pipeline = [
             {
-                $match: {
-                    $expr: {
-                        $eq: [{ $toString: "$_id" }, id]
-                    }
+              '$match': {
+                '$expr': {
+                  '$eq': [
+                    {
+                      '$toString': '$_id'
+                    }, id
+                  ]
                 }
+              }
+            }, {
+              '$lookup': {
+                'from': 'roomimages', 
+                'let': {
+                  'room': '$_id'
+                }, 
+                'pipeline': [
+                  {
+                    '$match': {
+                      '$expr': {
+                        '$eq': [
+                          '$room', '$$room'
+                        ]
+                      }
+                    }
+                  }
+                ], 
+                'as': 'image_mapping'
+              }
             }
-        ]
+          ]
 
         const room = await Room.aggregate(pipeline);
 
