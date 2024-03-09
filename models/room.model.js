@@ -29,6 +29,11 @@ var room = new Schema({
   },
   description: {
     type: String
+  },
+  status:{
+    type:String,
+    enum:['เปิดจอง','ปิดจองชั่วคราว','ยกเลิก'],
+    default:"เปิดจอง"
   }
 
 });
