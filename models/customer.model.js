@@ -22,15 +22,23 @@ var customer = new Schema({
 });
 
 const validateCustomer = (data) => {
-    const schema = Joi.object({
-        name:Joi.string(),
-        password: Joi.string(),
-        telephone: Joi.string(),
-        email: Joi.string()
-    });
-    return schema.validate(data);
+  const schema = Joi.object({
+    name: Joi.string(),
+    password: Joi.string(),
+    telephone: Joi.string(),
+    email: Joi.string()
+  });
+  return schema.validate(data);
 };
+
+const validateCustomerLogin = (data) => {
+  const schema = Joi.object({
+    password: Joi.string(),
+    email: Joi.string()
+  });
+  return schema.validate(data);
+}
 
 const Customer = mongoose.model('Customer', customer);
 
-module.exports = { Customer, validateCustomer };
+module.exports = { Customer, validateCustomer, validateCustomerLogin };
