@@ -34,20 +34,28 @@ var room = new Schema({
     type:String,
     enum:['เปิดจอง','ปิดจองชั่วคราว','ยกเลิก'],
     default:"เปิดจอง"
-  }
+  },
+  amenity: [{
+    type: String
+  }],
+  overview: [{
+    type: String
+  }]
 
 });
 
 const validateRoom = (data) => {
     const schema = Joi.object({
 
-        base_price: Joi.number().required(),    
-        type: Joi.string().required(),
+        base_price: Joi.number(),    
+        type: Joi.string(),
         max_person: Joi.number(),
         children: Joi.number(),
-        base_price: Joi.number().required(),    
-        room_amount: Joi.number().required(),
+        base_price: Joi.number(),    
+        room_amount: Joi.number(),
         description: Joi.string(),
+        overview: Joi.array().items(Joi.string()),
+        amenity: Joi.array().items(Joi.string()),
 
     });
 

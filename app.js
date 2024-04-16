@@ -15,6 +15,7 @@ var employeeRouter = require('./routes/employee');
 var hotelRouter = require('./routes/hotel');
 var roomRouter = require('./routes/room');
 var roomOverviewRouter = require('./routes/room-overview');
+var roomAmenityRouter = require('./routes/room-amenity');
 var promotionRouter = require('./routes/promotion');
 var customerRouter = require('./routes/customer');
 
@@ -31,6 +32,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, '../uploads')));
+app.use('/imm_hotel',express.static(path.join(__dirname, '../uploads')));
 
 const prefix ='/imm_hotel'
 app.use(prefix+'/', indexRouter);
@@ -38,6 +40,8 @@ app.use(prefix+'/users', usersRouter);
 app.use(prefix+'/employee', employeeRouter);
 app.use(prefix+'/hotel', hotelRouter);
 app.use(prefix+'/room', roomRouter);
+app.use(prefix+'/room-overview', roomOverviewRouter);
+app.use(prefix+'/room-amenity', roomAmenityRouter);
 app.use(prefix+'/promotion', promotionRouter);
 app.use(prefix+'/customer', customerRouter);
 

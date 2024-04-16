@@ -33,7 +33,7 @@ module.exports.getAll = async (req, res) => {
 
         const pipeline = [
             {
-                $match: {}
+                '$match': {}
             }
         ]
         const room = await Room.aggregate(pipeline);
@@ -53,36 +53,101 @@ module.exports.getById = async (req, res) => {
 
         const pipeline = [
             {
-              '$match': {
-                '$expr': {
-                  '$eq': [
-                    {
-                      '$toString': '$_id'
-                    }, id
-                  ]
-                }
-              }
-            }, {
-              '$lookup': {
-                'from': 'roomimages', 
-                'let': {
-                  'room': '$_id'
-                }, 
-                'pipeline': [
-                  {
-                    '$match': {
-                      '$expr': {
+                '$match': {
+                    '$expr': {
                         '$eq': [
-                          '$room', '$$room'
+                            {
+                                '$toString': '$_id'
+                            }, id
                         ]
-                      }
                     }
-                  }
-                ], 
-                'as': 'image_mapping'
-              }
+                }
+            }, {
+                '$lookup': {
+                    'from': 'roomimages',
+                    'let': {
+                        'room': '$_id'
+                    },
+                    'pipeline': [
+                        {
+                            '$match': {
+                                '$expr': {
+                                    '$eq': [
+                                        '$room', '$$room'
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    'as': 'image_mapping'
+                }
+            }, {
+                '$set': {
+                    'overview': {
+                        '$cond': {
+                            'if': '$overview',
+                            'then': '$overview',
+                            'else': []
+                        }
+                    },
+                    'amenity': {
+                        '$cond': {
+                            'if': '$amenity',
+                            'then': '$amenity',
+                            'else': []
+                        }
+                    }
+                }
+            }, {
+                '$lookup': {
+                    'from': 'roomoverviews',
+                    'let': {
+                        'overview': '$overview'
+                    },
+                    'pipeline': [
+                        {
+                            '$match': {
+                                '$expr': {
+                                    '$in': [
+                                        {
+                                            '$toString': '$_id'
+                                        }, '$$overview'
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    'as': 'overview_mapping'
+                }
+            }, {
+                '$lookup': {
+                    'from': 'roomamenities',
+                    'let': {
+                        'amenity': '$amenity'
+                    },
+                    'pipeline': [
+                        {
+                            '$match': {
+                                '$expr': {
+                                    '$in': [
+                                        {
+                                            '$toString': '$_id'
+                                        }, '$$amenity'
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    'as': 'amenity_mapping'
+                }
+            }, {
+                '$unset': [
+                    'overview', 'amenity'
+                ]
             }
-          ]
+        ]
+
+
 
         const room = await Room.aggregate(pipeline);
 
@@ -103,6 +168,13 @@ module.exports.update = async (req, res) => {
         if (error) {
             return res.status(400).send({ message: "validate error", error: error.details[0].message });
         };
+
+        const room = await Room.findById(id);
+
+        if (!room) {
+            return res.status(400).send({ message: "room not found" })
+        }
+
 
         const result = await Room.findByIdAndUpdate(id, req.body);
 
@@ -152,10 +224,10 @@ module.exports.uploadCoverImage = async (req, res) => {
 
             const room = await Room.findById(id);
 
-                fs.unlink('../uploads/' + room.image, err => {
-                    if (err) console.error(err);
-                    console.log(room.image+' was deleted');
-                });
+            fs.unlink('../uploads/' + room.image, err => {
+                if (err) console.error(err);
+                console.log(room.image + ' was deleted');
+            });
 
 
             const result = await Room.findByIdAndUpdate(id, { image: req.file.filename });

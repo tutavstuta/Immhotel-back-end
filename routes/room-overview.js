@@ -3,10 +3,10 @@ var router = express.Router();
 var RoomOverview = require('../controllers/room-overview.controller');
 var Auth = require('../middleware/auth');
 
-router.get('/room-overview',Auth,RoomOverview.getAll);
-router.get('/room-overview/:id',Auth,RoomOverview.getById);
-router.post('/room-overview',Auth,RoomOverview.create);
-router.patch('/room-overview/:id',Auth,RoomOverview.update);
-router.delete('/room-overview/:id',Auth,RoomOverview.delete);
+router.get('/',Auth(['employee','customer']),RoomOverview.getAll);
+router.get('/:id',Auth(['employee']),RoomOverview.getById);
+router.post('/',Auth(['employee']),RoomOverview.create);
+router.patch('/:id',Auth(['employee']),RoomOverview.update);
+router.delete('/:id',Auth(['employee']),RoomOverview.delete);
 
 module.exports = router

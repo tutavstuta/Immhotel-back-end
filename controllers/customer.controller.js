@@ -1,4 +1,5 @@
 const { Customer, validateCustomer, validateCustomerLogin } = require('../models/customer.model');
+const { Room } = require('../models/room.model');
 const bcrypt = require('bcrypt');
 const { generateToken } = require('../lib/jwthelper');
 
@@ -24,7 +25,8 @@ module.exports.signup = async (req, res) => {
             name: req.body.name,
             password: password,
             telephone: req.body.telephone,
-            email: req.body.email
+            email: req.body.email,
+            role: 'customer'
         }
 
         const customer = await Customer.create(customerData);
@@ -71,4 +73,148 @@ module.exports.login = async (req, res) => {
         console.error(error);
         return res.send(error.message);
     }
+};
+
+module.exports.getMe = async (req, res) => {
+
+    try {
+
+        const me = req.user;
+
+        return res.status(200).send({ message: "get me successfully",data:me });
+
+    } catch (error) {
+        console.error(error);
+        return res.send(error.message);
+    }
+};
+
+module.exports.roomlist = async (req,res) => {
+    try {
+
+        const rooms = await Room.find({},{base_price:0,__v:0});
+
+        return res.status(200).send({message:"get room successfully",data:rooms});
+        
+    } catch (error) {
+        console.error(error);
+        return res.send(error.message);
+    }
+};
+
+module.exports.roomDetail = async (req,res) => {
+    try {
+
+        const id = req.params.id;
+
+        const pipeline = [
+            {
+                '$match': {
+                    '$expr': {
+                        '$eq': [
+                            {
+                                '$toString': '$_id'
+                            }, id
+                        ]
+                    }
+                }
+            },{
+                '$project':{
+                    'base_price':0,
+                    '__v':0
+                }
+            } ,{
+                '$lookup': {
+                    'from': 'roomimages',
+                    'let': {
+                        'room': '$_id'
+                    },
+                    'pipeline': [
+                        {
+                            '$match': {
+                                '$expr': {
+                                    '$eq': [
+                                        '$room', '$$room'
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    'as': 'image_mapping'
+                }
+            }, {
+                '$set': {
+                    'overview': {
+                        '$cond': {
+                            'if': '$overview',
+                            'then': '$overview',
+                            'else': []
+                        }
+                    },
+                    'amenity': {
+                        '$cond': {
+                            'if': '$amenity',
+                            'then': '$amenity',
+                            'else': []
+                        }
+                    }
+                }
+            }, {
+                '$lookup': {
+                    'from': 'roomoverviews',
+                    'let': {
+                        'overview': '$overview'
+                    },
+                    'pipeline': [
+                        {
+                            '$match': {
+                                '$expr': {
+                                    '$in': [
+                                        {
+                                            '$toString': '$_id'
+                                        }, '$$overview'
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    'as': 'overview_mapping'
+                }
+            }, {
+                '$lookup': {
+                    'from': 'roomamenities',
+                    'let': {
+                        'amenity': '$amenity'
+                    },
+                    'pipeline': [
+                        {
+                            '$match': {
+                                '$expr': {
+                                    '$in': [
+                                        {
+                                            '$toString': '$_id'
+                                        }, '$$amenity'
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    'as': 'amenity_mapping'
+                }
+            }, {
+                '$unset': [
+                    'overview', 'amenity'
+                ]
+            }
+        ]
+
+        const room = await Room.aggregate(pipeline);
+
+        return res.status(200).send({message:"get room successfully",data:room[0]});
+        
+    } catch (error) {
+        console.error(error);
+        return res.send(error.message);
+    }
 }
+
