@@ -37,7 +37,8 @@ var booking = new Schema({
     },
     suspense: {
         type: Boolean,
-        required: true
+        required: true,
+        default:false
     },
     room: {
         type: Schema.Types.ObjectId,
@@ -53,16 +54,12 @@ var booking = new Schema({
 
 const validateBooking = (data) => {
     const schema = Joi.object({
-        num_guess:Joi.number(),
-        num_children:Joi.number(),
-        total_nigths:Joi.number(),
-        price_per_night:Joi.number(),
-        total_price:Joi.number(),
-        date_from:Joi.string(),
-        date_to:Joi.string(),
-        suspense:Joi.boolean(),
-        room:Joi.string(),
-        customer:Joi.string(),
+        "numGuess": Joi.number().required(),
+        "numbChildren": Joi.number().required(),
+        "totalNigths": Joi.number().required(),
+        "checkIn": Joi.date().required(),
+        "checkOut": Joi.date().required(),
+        "roomId": Joi.string().required()
     });
     return schema.validate(data);
 }

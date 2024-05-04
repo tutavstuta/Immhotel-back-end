@@ -30,10 +30,10 @@ var room = new Schema({
   description: {
     type: String
   },
-  status:{
-    type:String,
-    enum:['เปิดจอง','ปิดจองชั่วคราว','ยกเลิก'],
-    default:"เปิดจอง"
+  status: {
+    type: String,
+    enum: ['เปิดจอง', 'ปิดจองชั่วคราว', 'ยกเลิก'],
+    default: "เปิดจอง"
   },
   amenity: [{
     type: String
@@ -45,23 +45,33 @@ var room = new Schema({
 });
 
 const validateRoom = (data) => {
-    const schema = Joi.object({
+  const schema = Joi.object({
 
-        base_price: Joi.number(),    
-        type: Joi.string(),
-        max_person: Joi.number(),
-        children: Joi.number(),
-        base_price: Joi.number(),    
-        room_amount: Joi.number(),
-        description: Joi.string(),
-        overview: Joi.array().items(Joi.string()),
-        amenity: Joi.array().items(Joi.string()),
+    base_price: Joi.number(),
+    type: Joi.string(),
+    max_person: Joi.number(),
+    children: Joi.number(),
+    base_price: Joi.number(),
+    room_amount: Joi.number(),
+    description: Joi.string(),
+    overview: Joi.array().items(Joi.string()),
+    amenity: Joi.array().items(Joi.string()),
 
-    });
+  });
 
-    return schema.validate(data);
+  return schema.validate(data);
+}
+
+const validateSearch = (data) => {
+  const schema = Joi.object({
+    adult: Joi.number(),
+    children: Joi.number(),
+    checkIn: Joi.date(),
+    checkOut: Joi.date()
+  });
+  return schema.validate(data);
 }
 
 const Room = mongoose.model('Room', room);
 
-module.exports = { Room, validateRoom };
+module.exports = { Room, validateRoom, validateSearch };
