@@ -128,3 +128,4 @@ dist
 
 # key
 .key/*
+.vercel

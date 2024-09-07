@@ -1,0 +1,16 @@
+{
+    "version": 2,
+    "builds": [
+    {
+    "src": "www",
+    "use": "@vercel/node"
+    }
+    ] ,
+    "rewrites": [
+    {
+    "source": "/(.*)",
+    "destination": "/bin/www"
+    }
+    ]
+    
+    }
