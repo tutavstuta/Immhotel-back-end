@@ -41,25 +41,28 @@ var booking = new Schema({
         default:false
     },
     room: {
-        type: Schema.Types.ObjectId,
+        type: String,
         required: true,
-        ref: 'room'
+       
     },
     customer: {
         type: Schema.Types.ObjectId,
         required: true,
         ref: 'customer'
+    },
+    promotion:{
+        type:Schema.Types.Mixed
     }
 });
 
 const validateBooking = (data) => {
     const schema = Joi.object({
-        "numGuess": Joi.number().required(),
-        "numbChildren": Joi.number().required(),
-        "totalNigths": Joi.number().required(),
+        "adult": Joi.number().required(),
+        "children": Joi.number().required(),
         "checkIn": Joi.date().required(),
         "checkOut": Joi.date().required(),
-        "roomId": Joi.string().required()
+        "roomId": Joi.string().required(),
+        "promotionId":Joi.string().required()
     });
     return schema.validate(data);
 }

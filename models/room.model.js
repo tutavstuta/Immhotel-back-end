@@ -64,6 +64,7 @@ const validateRoom = (data) => {
 
 const validateSearch = (data) => {
   const schema = Joi.object({
+    roomId:Joi.string().required(),
     adult: Joi.number(),
     children: Joi.number(),
     checkIn: Joi.date(),

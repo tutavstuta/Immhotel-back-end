@@ -11,6 +11,7 @@ router.get('/roomlist',Auth(['customer']),Customer.roomlist);
 router.get('/roomdetail/:id',Auth(['customer']),Customer.roomDetail);
 
 //booking
+router.get('/booked',Auth(['customer']),Booking.getAll);
 router.post('/searchroom',Auth(['customer']),Booking.search);
 router.post('/createbooking',Auth(['customer']),Booking.create);
 

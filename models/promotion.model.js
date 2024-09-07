@@ -13,9 +13,9 @@ var promotion = new Schema({
     discount: {
         type: Number
     },
-    condition: [{
+    condition: {
         type: String
-    }],
+    },
     image: {
         type: String
     }
@@ -26,7 +26,7 @@ const validatePromotion = (data) => {
         title: Joi.string(),
         description: Joi.string().allow(""),
         discount: Joi.number().min(0),
-        condition: Joi.array().items(Joi.string().allow(""))
+        condition: Joi.string().allow("")
     });
     return schema.validate(data);
 }
