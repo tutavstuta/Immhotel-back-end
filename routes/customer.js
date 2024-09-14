@@ -3,6 +3,8 @@ var router = express.Router();
 var Customer = require('../controllers/customer.controller');
 var Booking = require('../controllers/booking.controller');
 var Auth = require('../middleware/auth');
+const multer = require('multer')
+const upload = multer({ dest: './slip' });
 
 router.post('/signup',Customer.signup);
 router.post('/login',Customer.login);
@@ -14,5 +16,6 @@ router.get('/roomdetail/:id',Auth(['customer']),Customer.roomDetail);
 router.get('/booked',Auth(['customer']),Booking.getAll);
 router.post('/searchroom',Auth(['customer']),Booking.search);
 router.post('/createbooking',Auth(['customer']),Booking.create);
+router.post('/sendslip',Auth(['customer']),upload.single('slip'),Booking.sendSlip);
 
 module.exports = router;

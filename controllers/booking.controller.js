@@ -260,3 +260,26 @@ async function searchRoom(data) {
 
 };
 
+
+
+module.exports.sendSlip = async (req, res) => {
+    try {
+
+        const id = req.body.bookingId;
+
+        if(req.file){
+            console.log(req.file);
+            const result = await Booking.findByIdAndUpdate(id,{slip:req.file.path},{new:true});
+
+            if(result){
+                console.log(result);
+                return res.status(200).send({message:'ok',data:result._id});
+            }
+        }
+
+    } catch (error) {
+        console.error(error);
+        return res.send(error.message);
+    }
+}
+

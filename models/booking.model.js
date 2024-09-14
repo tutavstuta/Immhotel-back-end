@@ -52,6 +52,9 @@ var booking = new Schema({
     },
     promotion:{
         type:Schema.Types.Mixed
+    },
+    slip:{
+        type:String
     }
 });
 
