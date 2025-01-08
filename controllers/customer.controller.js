@@ -1,8 +1,97 @@
-const { Customer, validateCustomer, validateCustomerLogin } = require('../models/customer.model');
+const { Customer, validateCustomer, validateCustomerLogin, validateEditProfile, validateProfile } = require('../models/customer.model');
 const { Room } = require('../models/room.model');
 const bcrypt = require('bcrypt');
 const { generateToken } = require('../lib/jwthelper');
+const { response } = require('express');
+const { verifyToken } = require('../middleware/auth');
 
+module.exports.profile = async (req, res) => {
+    try {
+        const userId = req.user.user_id;  // ใช้ user_id จาก decoded token
+        console.log("Customer ID:", userId);
+
+        // ดึงข้อมูลโปรไฟล์จากฐานข้อมูลตาม user_id
+        const profile = await Customer.findById(userId, { base_price: 0, __v: 0 });
+
+        if (!profile) {
+            return res.status(404).send({ message: 'Profile not found' });
+        }
+
+        return res.status(200).send({
+            message: "get profile successfully",
+            data: profile
+        });
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({ message: error.message });
+    }
+};
+
+module.exports.editprofile = async (req, res) => {
+    try {
+        // ดึง ID และข้อมูลที่ต้องการอัปเดต
+        const userId = req.user.user_id;  // ใช้ user_id จาก decoded token
+        console.log("Customer ID:", userId);
+
+        // ตรวจสอบว่ามีการส่งข้อมูลใหม่มาใน request หรือไม่
+        const updatedData = req.body;
+
+        // ตรวจสอบว่า userId มีค่าอยู่ใน token หรือไม่
+        if (!userId) {
+            return res.status(401).send({ message: 'User ID not found in token' });
+        }
+
+        // ตรวจสอบว่าผู้ใช้งานมีอยู่ในระบบหรือไม่
+        const existingCustomer = await Customer.findById(userId);
+        if (!existingCustomer) {
+            return res.status(404).send({ message: "Customer not found" });
+        }
+
+        // ตรวจสอบ Validation ข้อมูลที่ส่งมา
+        const { error } = validateEditProfile(updatedData);
+        if (error) {
+            return res.status(400).send({
+                message: "Validation error",
+                error: error.details[0].message
+            });
+        }
+
+        // Hash password ใหม่หากมีการส่ง password มา
+        if (updatedData.password) {
+            updatedData.password = bcrypt.hashSync(updatedData.password, 10);
+        }
+
+        // อัปเดตข้อมูลผู้ใช้
+        const updatedCustomer = await Customer.findByIdAndUpdate(
+            userId,  // ใช้ userId แทน id
+            { $set: updatedData },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedCustomer) {
+            return res.status(404).send({ message: "Customer not found" });
+        }
+
+        // ส่งข้อมูลกลับไปให้ client
+        return res.status(200).send({
+            message: "Profile updated successfully",
+            data: {
+                customer_id: updatedCustomer._id,
+                name: updatedCustomer.name,
+                email: updatedCustomer.email,
+                telephone: updatedCustomer.telephone
+            }
+        });
+
+    } catch (error) {
+        console.error("Error updating profile:", error);
+        return res.status(500).send({
+            message: "Internal server error",
+            error: error.message
+        });
+    }
+};
 
 module.exports.signup = async (req, res) => {
     try {
@@ -47,7 +136,7 @@ module.exports.login = async (req, res) => {
             return res.status(400).send({ message: "validate error", error: error.details[0].message });
         };
 
-        const customer = await Customer.findOne({ username: req.body.username });
+        const customer = await Customer.findOne({ email: req.body.email });
 
         if (!customer) {
             return res.status(404).send({ message: "customer not found" });

@@ -4,11 +4,10 @@ const Auth = (role) => {
 
     try {
 
-
         return async (req, res, next) => {
 
             const authHeader = req.headers["authorization"];
-
+            
             if (authHeader && authHeader.startsWith("Bearer ")) {
 
                 const token = authHeader.split(" ")[1];
@@ -20,7 +19,7 @@ const Auth = (role) => {
                     };
 
                     req.user = decoded;
-
+                    console.log('Token:', req.user);
                     next();
                 }).catch((err)=>{
                     console.log(err);

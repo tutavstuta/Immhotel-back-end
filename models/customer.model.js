@@ -36,6 +36,26 @@ const validateCustomer = (data) => {
   return schema.validate(data);
 };
 
+const validateEditProfile = (data) => {
+  const schema = Joi.object({
+      name: Joi.string(),
+      password: Joi.string(),
+      telephone: Joi.string()
+  });
+
+  return schema.validate(data);
+};
+const validateProfile = (data) => {
+  const schema = Joi.object({
+      name: Joi.string(),
+      password: Joi.string(),
+      telephone: Joi.string(),
+      email: Joi.string()
+  });
+
+  return schema.validate(data);
+};
+
 const validateCustomerLogin = (data) => {
   const schema = Joi.object({
     password: Joi.string(),
@@ -46,4 +66,4 @@ const validateCustomerLogin = (data) => {
 
 const Customer = mongoose.model('Customer', customer);
 
-module.exports = { Customer, validateCustomer, validateCustomerLogin };
+module.exports = { Customer, validateCustomer, validateCustomerLogin, validateEditProfile, validateProfile };

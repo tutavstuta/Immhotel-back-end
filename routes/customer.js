@@ -8,6 +8,8 @@ const upload = multer({ dest: './slip' });
 
 router.post('/signup',Customer.signup);
 router.post('/login',Customer.login);
+router.patch('/editprofile',Auth(['customer']),Customer.editprofile);
+router.get('/profile',Auth(['customer']),Customer.profile);
 router.get('/me',Auth(['customer']),Customer.getMe);
 router.get('/roomlist',Auth(['customer']),Customer.roomlist);
 router.get('/roomdetail/:id',Auth(['customer']),Customer.roomDetail);
