@@ -5,6 +5,21 @@ const { generateToken } = require('../lib/jwthelper');
 const { response } = require('express');
 const { verifyToken } = require('../middleware/auth');
 
+module.exports.getAll = async (req,res) => {
+    try {
+
+        const customer = await Customer.find();
+
+        return res.status(200).send({message:"get customer successfully",data:customer})
+        
+    } catch (error) {
+
+        console.error(error);
+        return res.status(500).send({ message: error.message });
+        
+    }
+}
+
 module.exports.profile = async (req, res) => {
     try {
         const userId = req.user.user_id;  // ใช้ user_id จาก decoded token
