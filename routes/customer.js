@@ -6,6 +6,12 @@ var Auth = require('../middleware/auth');
 const multer = require('multer')
 const upload = multer({ dest: './slip' });
 
+//admin api
+router.get('/',Auth(['employee']),Customer.getAll)
+
+
+//customer api
+
 router.post('/signup',Customer.signup);
 router.post('/login',Customer.login);
 router.get('/me',Auth(['customer']),Customer.getMe);
@@ -13,7 +19,7 @@ router.get('/roomlist',Auth(['customer']),Customer.roomlist);
 router.get('/roomdetail/:id',Auth(['customer']),Customer.roomDetail);
 
 //booking
-router.get('/booked',Auth(['customer']),Booking.getAll);
+router.get('/booked',Auth(['customer']),Booking.getByCustomerId);
 router.post('/searchroom',Auth(['customer']),Booking.search);
 router.post('/createbooking',Auth(['customer']),Booking.create);
 router.post('/sendslip',Auth(['customer']),upload.single('slip'),Booking.sendSlip);

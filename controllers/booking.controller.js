@@ -1,6 +1,5 @@
 const { Booking, validateBooking } = require('../models/booking.model');
 const { Room, validateSearch } = require('../models/room.model');
-const { Promotion } = require('../models/promotion.model');
 
 module.exports.search = async (req, res) => {
     try {
@@ -72,12 +71,150 @@ module.exports.getAll = async (req, res) => {
         const pipeline = [
             {
                 $match: {}
+            },
+            {
+                $lookup: {
+                    from: "customers",
+                    localField: "customer",
+                    foreignField: "_id",
+                    as: "customer_mapping"
+                }
+            },
+            {
+                $set: {
+                    customer_name: { $first: "$customer_mapping.name" },
+                    customer_tel: { $first: "$customer_mapping.tel" },
+                    customer_email: { $first: "$customer_mapping.email" },
+                }
+            },
+            {
+                $unset: "customer_mapping"
             }
         ];
 
         const bookings = await Booking.aggregate(pipeline);
 
         return res.status(200).send(bookings)
+
+    } catch (error) {
+        console.error(error);
+        return res.send(error.message);
+    }
+};
+
+module.exports.getByCustomerId = async (req, res) => {
+    try {
+
+        const id = req.user.user_id;
+
+        const bookings = await Booking.find({ customer: id });
+
+        return res.status(200).send(bookings)
+
+    } catch (error) {
+        console.error(error);
+        return res.send(error.message);
+    }
+};
+
+module.exports.getOnRange = async (req, res) => {
+
+    try {
+
+        const { start, end } = req.body;
+        console.log(start,end)
+
+        const pipeline = [
+            {
+                '$set': {
+                  'date_from': {
+                    '$first': {
+                      '$split': [
+                        '$date_from', 'T'
+                      ]
+                    }
+                  }, 
+                  'date_to': {
+                    '$first': {
+                      '$split': [
+                        '$date_to', 'T'
+                      ]
+                    }
+                  }
+                }
+              },
+            {
+              '$match': {
+                '$or': [
+                  {
+                    '$and': [
+                      {
+                        '$expr': {
+                          '$gte': [
+                            {$toDate:'$date_from'}, {
+                              '$toDate': start
+                            }
+                          ]
+                        }
+                      }, {
+                        '$expr': {
+                          '$lte': [
+                            {$toDate:'$date_from'}, {
+                              '$toDate': end
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }, {
+                    '$and': [
+                      {
+                        '$expr': {
+                          '$gte': [
+                            {$toDate:'$date_to'}, {
+                              '$toDate': start
+                            }
+                          ]
+                        }
+                      }, {
+                        '$expr': {
+                          '$lte': [
+                            {$toDate:'$date_to'}, {
+                              '$toDate': end
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }, {
+                    '$and': [
+                      {
+                        '$expr': {
+                          '$lte': [
+                            {$toDate:'$date_from'}, {
+                              '$toDate': start
+                            }
+                          ]
+                        }
+                      }, {
+                        '$expr': {
+                          '$gte': [
+                            {$toDate:'$date_to'}, {
+                              '$toDate': end
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          ];
+
+        const bookings = await Booking.aggregate(pipeline)
+
+        return res.status(200).send({message:'ok',data:bookings});
 
     } catch (error) {
         console.error(error);
@@ -267,13 +404,13 @@ module.exports.sendSlip = async (req, res) => {
 
         const id = req.body.bookingId;
 
-        if(req.file){
+        if (req.file) {
             console.log(req.file);
-            const result = await Booking.findByIdAndUpdate(id,{slip:req.file.path},{new:true});
+            const result = await Booking.findByIdAndUpdate(id, { slip: req.file.path }, { new: true });
 
-            if(result){
+            if (result) {
                 console.log(result);
-                return res.status(200).send({message:'ok',data:result._id});
+                return res.status(200).send({ message: 'ok', data: result._id });
             }
         }
 

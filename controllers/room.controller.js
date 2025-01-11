@@ -245,4 +245,19 @@ module.exports.uploadCoverImage = async (req, res) => {
         }
     });
 
+};
+
+module.exports.search = async (req,res) => {
+    try {
+
+        const month = req.body.month;
+
+        const pipeline = [];
+
+        const rooms = await Room.aggregate(pipeline);
+
+        
+    } catch (error) {
+        return res.send(error.message)
+    }
 }

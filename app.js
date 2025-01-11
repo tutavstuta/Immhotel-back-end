@@ -12,6 +12,7 @@ connectDatabase();
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var employeeRouter = require('./routes/employee');
+var bookingRouter = require('./routes/booking');
 var hotelRouter = require('./routes/hotel');
 var roomRouter = require('./routes/room');
 var roomOverviewRouter = require('./routes/room-overview');
@@ -38,6 +39,7 @@ const prefix ='/imm_hotel'
 app.use(prefix+'/', indexRouter);
 app.use(prefix+'/users', usersRouter);
 app.use(prefix+'/employee', employeeRouter);
+app.use(prefix+'/booking', bookingRouter);
 app.use(prefix+'/hotel', hotelRouter);
 app.use(prefix+'/room', roomRouter);
 app.use(prefix+'/room-overview', roomOverviewRouter);

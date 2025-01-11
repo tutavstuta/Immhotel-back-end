@@ -3,6 +3,22 @@ const { Room } = require('../models/room.model');
 const bcrypt = require('bcrypt');
 const { generateToken } = require('../lib/jwthelper');
 
+module.exports.getAll = async (req,res) => {
+    try {
+
+        const page = Number(req.query.page) -1;
+        const limit = Number(req.query.limit);
+
+        const customers = await Customer.find({},{password:0}).skip(page*limit).limit(limit);
+
+        return res.status(200).send({message:'ok',data:customers});
+        
+    } catch (error) {
+        console.error(error);
+        return res.send(error.message);
+    }
+}
+
 
 module.exports.signup = async (req, res) => {
     try {
