@@ -9,6 +9,8 @@ const upload = multer({ dest: './slip' });
 //admin api
 router.get('/',Auth(['employee']),Customer.getAll)
 
+router.get('/roomlist', Customer.roomlist);
+router.get('/roomdetail/:id', Customer.roomDetail);
 
 //customer api
 

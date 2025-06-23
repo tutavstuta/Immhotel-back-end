@@ -198,10 +198,10 @@ module.exports.roomlist = async (req,res) => {
 
         const rooms = await Room.find({},{base_price:0,__v:0});
 
-        return res.status(200).send({message:"get room successfully",data:rooms});
+        return res.status(200).send({message:"Get room successfully",data:rooms});
         
     } catch (error) {
-        console.error(error);
+        console.error("Error in roomlist:",error);
         return res.send(error.message);
     }
 };
