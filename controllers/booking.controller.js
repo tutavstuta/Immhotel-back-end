@@ -102,6 +102,25 @@ module.exports.getAll = async (req, res) => {
     }
 };
 
+module.exports.getById = async (req, res) => {
+    try {
+
+        const bookingId = req.params.bookingId;
+
+        const booking = await Booking.findById(bookingId);
+
+        if (booking) {
+            return res.status(200).send({ message: 'ok', data: booking })
+        } else {
+            return res.status(400).send({ message: "booking not found", error: "invalid booking id" })
+        }
+
+    } catch (error) {
+        console.error(error);
+        return res.send(error.message);
+    }
+}
+
 module.exports.getByCustomerId = async (req, res) => {
     try {
 
@@ -122,99 +141,99 @@ module.exports.getOnRange = async (req, res) => {
     try {
 
         const { start, end } = req.body;
-        console.log(start,end)
+        console.log(start, end)
 
         const pipeline = [
             {
                 '$set': {
-                  'date_from': {
-                    '$first': {
-                      '$split': [
-                        '$date_from', 'T'
-                      ]
+                    'date_from': {
+                        '$first': {
+                            '$split': [
+                                '$date_from', 'T'
+                            ]
+                        }
+                    },
+                    'date_to': {
+                        '$first': {
+                            '$split': [
+                                '$date_to', 'T'
+                            ]
+                        }
                     }
-                  }, 
-                  'date_to': {
-                    '$first': {
-                      '$split': [
-                        '$date_to', 'T'
-                      ]
-                    }
-                  }
                 }
-              },
+            },
             {
-              '$match': {
-                '$or': [
-                  {
-                    '$and': [
-                      {
-                        '$expr': {
-                          '$gte': [
-                            {$toDate:'$date_from'}, {
-                              '$toDate': start
-                            }
-                          ]
+                '$match': {
+                    '$or': [
+                        {
+                            '$and': [
+                                {
+                                    '$expr': {
+                                        '$gte': [
+                                            { $toDate: '$date_from' }, {
+                                                '$toDate': start
+                                            }
+                                        ]
+                                    }
+                                }, {
+                                    '$expr': {
+                                        '$lte': [
+                                            { $toDate: '$date_from' }, {
+                                                '$toDate': end
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }, {
+                            '$and': [
+                                {
+                                    '$expr': {
+                                        '$gte': [
+                                            { $toDate: '$date_to' }, {
+                                                '$toDate': start
+                                            }
+                                        ]
+                                    }
+                                }, {
+                                    '$expr': {
+                                        '$lte': [
+                                            { $toDate: '$date_to' }, {
+                                                '$toDate': end
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
+                        }, {
+                            '$and': [
+                                {
+                                    '$expr': {
+                                        '$lte': [
+                                            { $toDate: '$date_from' }, {
+                                                '$toDate': start
+                                            }
+                                        ]
+                                    }
+                                }, {
+                                    '$expr': {
+                                        '$gte': [
+                                            { $toDate: '$date_to' }, {
+                                                '$toDate': end
+                                            }
+                                        ]
+                                    }
+                                }
+                            ]
                         }
-                      }, {
-                        '$expr': {
-                          '$lte': [
-                            {$toDate:'$date_from'}, {
-                              '$toDate': end
-                            }
-                          ]
-                        }
-                      }
                     ]
-                  }, {
-                    '$and': [
-                      {
-                        '$expr': {
-                          '$gte': [
-                            {$toDate:'$date_to'}, {
-                              '$toDate': start
-                            }
-                          ]
-                        }
-                      }, {
-                        '$expr': {
-                          '$lte': [
-                            {$toDate:'$date_to'}, {
-                              '$toDate': end
-                            }
-                          ]
-                        }
-                      }
-                    ]
-                  }, {
-                    '$and': [
-                      {
-                        '$expr': {
-                          '$lte': [
-                            {$toDate:'$date_from'}, {
-                              '$toDate': start
-                            }
-                          ]
-                        }
-                      }, {
-                        '$expr': {
-                          '$gte': [
-                            {$toDate:'$date_to'}, {
-                              '$toDate': end
-                            }
-                          ]
-                        }
-                      }
-                    ]
-                  }
-                ]
-              }
+                }
             }
-          ];
+        ];
 
         const bookings = await Booking.aggregate(pipeline)
 
-        return res.status(200).send({message:'ok',data:bookings});
+        return res.status(200).send({ message: 'ok', data: bookings });
 
     } catch (error) {
         console.error(error);
@@ -397,22 +416,22 @@ async function searchRoom(data) {
 
 };
 
-module.exports.getByRefNumber = async (req,res) => {
+module.exports.getByRefNumber = async (req, res) => {
     try {
 
-        const {refnumber} = req.params;
+        const { refnumber } = req.params;
 
-        const booking = await Booking.findOne({ref_number:refnumber});
+        const booking = await Booking.findOne({ ref_number: refnumber });
 
-        if(!booking){
-            return res.status(200).send({message:'ok',data:{}})
+        if (!booking) {
+            return res.status(200).send({ message: 'ok', data: {} })
         }
 
-        return res.status(200).send({message:'ok',data:booking})
-        
+        return res.status(200).send({ message: 'ok', data: booking })
+
     } catch (error) {
-        console.error('get booking by refnumber error ',error);
-        return res.status(500).send({message:'Internal Server Error'})
+        console.error('get booking by refnumber error ', error);
+        return res.status(500).send({ message: 'Internal Server Error' })
     }
 }
 

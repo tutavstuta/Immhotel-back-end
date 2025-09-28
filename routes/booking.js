@@ -5,6 +5,7 @@ var Auth = require('../middleware/auth');
 
 router.get('/',Auth(['employee']),Booking.getAll);
 router.get('/byref/:refnumber',Auth(['employee']),Booking.getByRefNumber);
+router.get('/byId/bookingId',Auth(['employee']),Booking.getById);
 router.post('/range',Auth(['employee']),Booking.getOnRange);
 
 
