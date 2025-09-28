@@ -397,6 +397,25 @@ async function searchRoom(data) {
 
 };
 
+module.exports.getByRefNumber = async (req,res) => {
+    try {
+
+        const {refnumber} = req.params;
+
+        const booking = await Booking.findOne({ref_number:refnumber});
+
+        if(!booking){
+            return res.status(200).send({message:'ok',data:{}})
+        }
+
+        return res.status(200).send({message:'ok',data:booking})
+        
+    } catch (error) {
+        console.error('get booking by refnumber error ',error);
+        return res.status(500).send({message:'Internal Server Error'})
+    }
+}
+
 
 
 module.exports.sendSlip = async (req, res) => {

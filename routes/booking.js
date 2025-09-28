@@ -4,6 +4,7 @@ var Booking = require('../controllers/booking.controller');
 var Auth = require('../middleware/auth');
 
 router.get('/',Auth(['employee']),Booking.getAll);
+router.get('/byref/:refnumber',Auth(['employee']),Booking.getByRefNumber);
 router.post('/range',Auth(['employee']),Booking.getOnRange);
 
 

@@ -34,6 +34,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, '../uploads')));
 app.use('/imm_hotel',express.static(path.join(__dirname, '../uploads')));
+app.use('/slip',express.static(path.join(__dirname, './slip')));
 
 const prefix ='/imm_hotel'
 app.use(prefix+'/', indexRouter);
