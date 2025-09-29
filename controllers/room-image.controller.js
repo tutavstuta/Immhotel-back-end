@@ -8,6 +8,28 @@ function fileFilter(req, file, cb) {
 
 }
 
+// อัปโหลดรูปหน้าปกและอัปเดต field image ใน Room
+module.exports.uploadRoomCover = (req, res) => {
+    upload(req, res, async function (err) {
+        if (err instanceof multer.MulterError) {
+            return res.status(400).send(err.message);
+        } else if (err) {
+            return res.status(400).send(err.message);
+        }
+
+        // อัปเดต field image ใน Room
+        const roomId = req.params.room;
+        const filename = req.file.filename;
+
+        const result = await Room.findByIdAndUpdate(roomId, { image: filename }, { new: true });
+
+        if (result) {
+            return res.status(200).send({ message: "success", data: result });
+        } else {
+            return res.status(400).send({ message: "update cover failed" });
+        }
+    });
+};
 module.exports.uploadRoomImage = (req, res) => {
     try {
         upload(req, res, async function (err) {

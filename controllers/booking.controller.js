@@ -458,3 +458,31 @@ module.exports.sendSlip = async (req, res) => {
     }
 }
 
+module.exports.update = async (req, res) => {
+    try {
+        const bookingId = req.params.bookingId;
+        const updateData = req.body;
+        const result = await Booking.findByIdAndUpdate(bookingId, updateData, { new: true });
+        if (result) {
+            return res.status(200).send({ message: "update booking successfully", data: result });
+        } else {
+            return res.status(400).send({ message: "update failed" });
+        }
+    } catch (error) {
+        return res.status(500).send({ message: error.message });
+    }
+};
+
+module.exports.delete = async (req, res) => {
+    try {
+        const bookingId = req.params.bookingId;
+        const result = await Booking.findByIdAndDelete(bookingId);
+        if (result) {
+            return res.status(200).send({ message: "delete booking successfully" });
+        } else {
+            return res.status(400).send({ message: "delete failed" });
+        }
+    } catch (error) {
+        return res.status(500).send({ message: error.message });
+    }
+};

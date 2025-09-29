@@ -6,6 +6,7 @@ var Auth = require('../middleware/auth');
 
 router.get('/',Auth(['employee']),Room.getAll);
 router.get('/:id',Auth(['employee']),Room.getById);
+router.put('/:id',Auth(['employee']),Room.updateRoomMainDetail);
 router.post('/available',Auth(['employee']),Room.search);
 router.post('/',Auth(['employee']),Room.create);
 router.patch('/:id',Auth(['employee']),Room.update);

@@ -46,6 +46,23 @@ module.exports.getAll = async (req, res) => {
     }
 };
 
+module.exports.updateRoomMainDetail = async (req, res) => {
+  try {
+    console.log('roomId:', req.params.id);
+    console.log('body:', req.body);
+    const roomId = req.params.id;
+    const updateData = req.body;
+    const result = await Room.findByIdAndUpdate(roomId, updateData, { new: true });
+    if (result) {
+      return res.status(200).send({ message: "update room successfully", data: result });
+    } else {
+      return res.status(400).send({ message: "update failed" });
+    }
+  } catch (error) {
+    return res.status(500).send({ message: error.message });
+  }
+};
+
 module.exports.getById = async (req, res) => {
     try {
 
