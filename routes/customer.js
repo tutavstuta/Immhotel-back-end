@@ -7,8 +7,9 @@ const multer = require('multer')
 const upload = multer({ dest: './slip' });
 
 //admin api
-router.get('/',Auth(['employee']),Customer.getAll)
+//router.get('/',Auth(['employee']),Customer.getAll)
 
+//guest api
 router.get('/roomlist', Customer.roomlist);
 router.get('/roomdetail/:id', Customer.roomDetail);
 
@@ -21,6 +22,7 @@ router.get('/profile',Auth(['customer']),Customer.profile);
 router.get('/me',Auth(['customer']),Customer.getMe);
 router.get('/roomlist',Auth(['customer']),Customer.roomlist);
 router.get('/roomdetail/:id',Auth(['customer']),Customer.roomDetail);
+
 
 //booking
 router.get('/booked',Auth(['customer']),Booking.getByCustomerId);

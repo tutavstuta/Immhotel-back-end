@@ -145,6 +145,41 @@ module.exports.signup = async (req, res) => {
 
 module.exports.login = async (req, res) => {
     try {
+        const { email, password, googleLogin, name } = req.body;
+
+        // ตรวจสอบว่าเป็น Google Login หรือไม่
+        if (googleLogin === true) {
+            console.log('Google Login detected for email:', email);
+            
+            // สำหรับ Google Login ไม่ต้องเช็ค password
+            const customer = await Customer.findOne({ email: email });
+            
+            if (customer) {
+                // พบผู้ใช้ สร้าง token ให้เลย
+                const payload = {
+                    user_id: customer._id,
+                    name: customer.name,
+                    role: customer.role
+                };
+
+                const token = generateToken(payload);
+                
+                console.log('Google Login successful for:', email);
+                
+                return res.status(200).json({
+                    message: 'Google login successful',
+                    token: token,
+                    tokenType: "Bearer"
+                });
+            } else {
+                console.log('Google user not found:', email);
+                return res.status(404).json({
+                    message: 'User not found. Please register with Google first.'
+                });
+            }
+        }
+
+        // Login แบบปกติ (โค้ดเดิม)
         const { error } = validateCustomerLogin(req.body);
 
         if (error) {

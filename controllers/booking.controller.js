@@ -36,10 +36,8 @@ module.exports.create = async (req, res) => {
             return res.status(400).send({ message: "invalid room data" });
         };
 
-        const selectPromotion = room[0].promotions.find(el => {
-            el._id == req.body.promotionId;
-            return el;
-        });
+        const selectPromotion = room[0].promotions.find(el => el._id.toString() === req.body.promotionId);
+        ;
 
         const bookingData = {
             ref_number: new Date().getTime(),

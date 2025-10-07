@@ -19,6 +19,7 @@ var roomOverviewRouter = require('./routes/room-overview');
 var roomAmenityRouter = require('./routes/room-amenity');
 var promotionRouter = require('./routes/promotion');
 var customerRouter = require('./routes/customer');
+var newsRouter = require('./routes/news');
 
 var app = express();
 app.use(cors());
@@ -36,6 +37,7 @@ app.use(express.static(path.join(__dirname, '../uploads')));
 app.use('/imm_hotel',express.static(path.join(__dirname, '../uploads')));
 app.use('/slip',express.static(path.join(__dirname, './slip')));
 
+
 const prefix ='/imm_hotel'
 app.use(prefix+'/', indexRouter);
 app.use(prefix+'/users', usersRouter);
@@ -47,6 +49,7 @@ app.use(prefix+'/room-overview', roomOverviewRouter);
 app.use(prefix+'/room-amenity', roomAmenityRouter);
 app.use(prefix+'/promotion', promotionRouter);
 app.use(prefix+'/customer', customerRouter);
+app.use(prefix+'/news', newsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
