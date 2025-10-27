@@ -177,30 +177,18 @@ module.exports.getById = async (req, res) => {
 }
 
 module.exports.update = async (req, res) => {
-    try {
+  try {
+    const allowed = ['type','max_person','children','base_price','room_amount','description','status'];
+    const payload = {};
+    for (const k of allowed) if (k in req.body) payload[k] = req.body[k];
 
-        const id = req.params.id;
-
-        const { error } = validateRoom(req.body);
-        if (error) {
-            return res.status(400).send({ message: "validate error", error: error.details[0].message });
-        };
-
-        const room = await Room.findById(id);
-
-        if (!room) {
-            return res.status(400).send({ message: "room not found" })
-        }
-
-
-        const result = await Room.findByIdAndUpdate(id, req.body);
-
-        return res.status(200).send({ message: "update room successfully", data: result._id });
-
-    } catch (error) {
-        console.error(error);
-        return res.send(error.message);
-    }
+    const room = await Room.findByIdAndUpdate(req.params.id, { $set: payload }, { new: true });
+    if (!room) return res.status(404).json({ message: 'room not found' });
+    return res.status(200).json({ message: 'update room successfully', data: room });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'internal error' });
+  }
 };
 
 module.exports.delete = async (req, res) => {

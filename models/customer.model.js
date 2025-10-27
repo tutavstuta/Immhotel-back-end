@@ -2,68 +2,36 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var Joi = require('joi');
 
-var customer = new Schema({
-  email: {
-    type: String,
-    required: true
-  },
-  password: {
-    type: String,
-    required: true
-  },
-  name: {
-    type: String,
-    required: true
-  },
-  telephone: {
-    type: String,
-    required: true
-  },
-  role:{
-    type: String,
-    require:true,
-    default:'customer'
+// กำหนดชื่อ schema เป็น customerSchema และใช้ชื่อนี้ต่อไป
+const customerSchema = new Schema({
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true, select: false },
+  name: { type: String },
+  telephone: { type: String },
+  role: { type: String, default: 'customer' }
+}, { timestamps: true });
+
+// ซ่อนฟิลด์ที่ไม่ควรส่งกลับ และลบ __v
+customerSchema.set('toJSON', {
+  transform: function (_doc, ret) {
+    delete ret.password;
+    delete ret.__v;
+    return ret;
   }
 });
 
+// (ถ้ามี) เพิ่ม validate ด้วย Joi — ปรับให้ตรงกับของคุณ
 const validateCustomer = (data) => {
   const schema = Joi.object({
-    name: Joi.string(),
-    password: Joi.string(),
-    telephone: Joi.string(),
-    email: Joi.string()
+    email: Joi.string().email().required(),
+    password: Joi.string().min(6).required(),
+    name: Joi.string().allow('', null),
+    telephone: Joi.string().allow('', null),
+    role: Joi.string().valid('customer','employee','admin').default('customer')
   });
   return schema.validate(data);
 };
 
-const validateEditProfile = (data) => {
-  const schema = Joi.object({
-      name: Joi.string(),
-      password: Joi.string(),
-      telephone: Joi.string()
-  });
+const Customer = mongoose.model('Customer', customerSchema);
 
-  return schema.validate(data);
-};
-const validateProfile = (data) => {
-  const schema = Joi.object({
-      name: Joi.string(),
-      password: Joi.string(),
-      telephone: Joi.string(),
-      email: Joi.string()
-  });
-
-  return schema.validate(data);
-};
-
-const validateCustomerLogin = (data) => {
-  const schema = Joi.object({
-    password: Joi.string(),
-    email: Joi.string()
-  });
-  return schema.validate(data);
-}
-
-const Customer = mongoose.model('Customer', customer);
-
-module.exports = { Customer, validateCustomer, validateCustomerLogin, validateEditProfile, validateProfile };
+module.exports = { Customer, validateCustomer };
